@@ -1,0 +1,34 @@
+__pycache__/
+*.env
+venv/
+*.pyc
+*.db
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Pretrained deep-learning weights (FaceNet etc.) - large, downloaded on demand.
+# scikit-learn models (*.pkl / *.joblib) are small and ARE committed.
+*.pt
+*.pth
+*.onnx
+*.h5
+.cache/
+checkpoints/
+
+# Generated data (recreate by running the notebook)
+datasets/augmented/
+datasets/processed/
+datasets/cropped/
+*.npy
+*.npz
+
+# Outputs
+outputs/
+*.log
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
