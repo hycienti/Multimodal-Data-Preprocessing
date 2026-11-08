@@ -32,3 +32,5 @@ outputs/
 .vscode/
 .idea/
 .DS_Store
+
+try.py

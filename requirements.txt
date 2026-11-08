@@ -8,3 +8,4 @@ matplotlib
 pillow
 opencv-python
 joblib
+ipykernel
