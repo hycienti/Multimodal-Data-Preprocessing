@@ -18,7 +18,6 @@ env/
 checkpoints/
 
 # Generated data (recreate by running the notebook)
-datasets/augmented/
 datasets/processed/
 datasets/cropped/
 *.npy
@@ -34,3 +33,4 @@ outputs/
 .DS_Store
 
 try.py
+original.zip
