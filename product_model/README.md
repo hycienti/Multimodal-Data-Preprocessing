@@ -9,7 +9,7 @@ product_model/
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
-├── product_model.py  
+├── product_model.py
 ├── product_recommendation_model.ipynb
 ├── data/
 │   ├── customer_social_profiles - customer_social_profiles.csv
@@ -21,10 +21,11 @@ product_model/
     ├── feature_columns.pkl
     ├── median_rating.pkl
     └── scaler.pkl
+```
 
 | File | Description |
 |---|---|
-| `notebooks/product_recommendation_model.ipynb` | Full notebook: cleaning, merge, EDA, features, models, evaluation |
+| `product_recommendation_model.ipynb` | Full notebook: cleaning, merge, EDA, features, models, evaluation |
 | `product_model.py` | Prediction script, loads the saved files from `models/` |
 | `data/merged_dataset.csv` | Merged data with engineered features, 117 rows, 8 missing ratings kept on purpose |
 | `data/model_ready_dataset.csv` | Encoded features and target, ratings filled, no missing values |
@@ -49,7 +50,7 @@ Single 80/20 split (24 test rows):
 
 | Model | Accuracy | F1 (weighted) | Log loss |
 |---|---|---|---|
-| Baseline  | 0.250 | 0.100 | 1.593 |
+| Baseline (most common class) | 0.250 | 0.100 | 1.593 |
 | Logistic Regression | 0.167 | 0.160 | 2.428 |
 | Random Forest | 0.167 | 0.161 | 1.669 |
 
@@ -57,7 +58,7 @@ Single 80/20 split (24 test rows):
 
 | Model | Accuracy | F1 (weighted) | Log loss |
 |---|---|---|---|
-| Baseline  | 0.214 | 0.075 | 1.600 |
+| Baseline (most common class) | 0.214 | 0.075 | 1.600 |
 | Logistic Regression | 0.240 | 0.223 | 1.939 |
 | Random Forest | 0.290 | 0.275 | 1.593 |
 
@@ -81,12 +82,12 @@ from product_model import predict_product, predict_with_confidence
 
 customer = {
     "purchase_amount": 250,
-    "customer_rating": 3.5,        
+    "customer_rating": 3.5,         
     "engagement_score": 80,
     "purchase_interest_score": 4.0,
     "num_profiles": 1,
     "month": 3,
-    "day_of_week": 2,              
+    "day_of_week": 2,                
     "main_platform": "Twitter",
     "main_sentiment": "Positive",
 }
@@ -96,3 +97,5 @@ print(predict_with_confidence(customer))
 ```
 
 `predict_with_confidence` returns the top product, its probability, the runner-up, and a `low_confidence` flag (set when the probability is below 0.35).
+
+The notebook reads and writes files with the relative paths `data/...` and `models/...`, so run it from this folder.
