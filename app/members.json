@@ -1,0 +1,7 @@
+{
+  "_comment": "Demo assignment of each registered member to a customer_id in product_model/data/merged_dataset.csv. The datasets do not link people to customers, so edit these as needed.",
+  "alain": 187,
+  "bode": 114,
+  "elyse": 101,
+  "hycient": 188
+}
