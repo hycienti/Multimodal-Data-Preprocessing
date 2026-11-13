@@ -48,7 +48,20 @@ def banner(text):
 
 def access_denied(reason):
     print(f"\n  ACCESS DENIED: {reason}")
+    print("  Nothing is shown without both checks. Run the command again to try once more.")
     return 1
+
+
+def show_overview(name):
+    print(f"\nHi {name}. This login has 3 steps:")
+    print("  1. Face check   - we compare a photo of you with your account")
+    print("  2. Product pick - we prepare your recommendation (hidden for now)")
+    print("  3. Voice check  - you say a short phrase, then we show the result")
+
+
+def tries_left(attempt, attempts):
+    left = attempts - attempt
+    return f"{left} {'try' if left == 1 else 'tries'} left"
 
 
 def save_capture(kind, data):
@@ -73,22 +86,39 @@ def run_face_check(args, name):
     banner("Step 1/3 - Facial recognition")
     for attempt in range(1, args.attempts + 1):
         if args.image:
+            print(f"  Using the photo {args.image} instead of the camera.")
             image, color_order = args.image, "RGB"
         else:
-            print("  Look at the camera" + ("" if args.no_preview else " and press SPACE"))
-            image, color_order = capture_photo(args.camera, preview=not args.no_preview), "BGR"
+            if args.no_preview:
+                print("  Look at the camera. The photo is taken automatically.")
+            else:
+                if attempt == 1:
+                    print("  A camera window is opening so we can take your photo.")
+                print("  Look at the camera and press SPACE to take the photo (Q or ESC cancels).")
+            image = capture_photo(args.camera, preview=not args.no_preview,
+                                  note=f"Attempt {attempt} of {args.attempts}")
+            color_order = "BGR"
             if args.save_captures:
                 save_capture("photo", image)
 
+        taken = "" if args.image else "Photo taken. "
+        slow = " (this can take a few seconds)" if attempt == 1 else ""
+        print(f"  {taken}Checking your face...{slow}")
         result = asyncio.run(verify_user(user_name=name, image=image, color_order=color_order))
         if result["success"]:
             match = result["matches"]
             print(f"  Face verified as {name} (similarity {match['similarity_score']})")
+            print("  Next: preparing your product recommendation.")
             return True, None
-        print(f"  [{attempt}/{args.attempts}] {result['message']}")
+        # the pipeline's messages end in "Try again", which is wrong on the last attempt
+        message = result["message"].removesuffix(" Try again")
+        print(f"  [{attempt}/{args.attempts}] {message}")
         if args.image:  # same file would give the same answer
             break
-    return False, result["message"]
+        if attempt < args.attempts:
+            print(f"  {tries_left(attempt, args.attempts)}. Opening the camera again - "
+                  "face it directly, in good light.")
+    return False, message
 
 
 def run_product_model(args, name):
@@ -98,7 +128,9 @@ def run_product_model(args, name):
     banner("Step 2/3 - Product recommendation")
     customer_id = args.customer_id or customer_id_for(name)
     prediction = predict_with_confidence(customer_profile(customer_id))
-    print(f"  Recommendation ready for customer {customer_id} (locked until voice check)")
+    print(f"  Your recommendation is ready (customer {customer_id}).")
+    print("  It stays hidden until your voice confirms it's you.")
+    print("  Next: the voice check.")
     return prediction
 
 
@@ -111,13 +143,17 @@ def run_voice_check(args, name):
     verifier = VoiceVerification(VOICE_MODEL)
     for attempt in range(1, args.attempts + 1):
         if args.audio:
+            print(f"  Using the recording {args.audio} instead of the microphone.")
             signal = load_audio(args.audio)
         else:
-            print('  Say "Yes, approve" or "Confirm transaction"')
+            if attempt == 1:
+                print(f"  No camera this time - we only record your voice for {args.seconds:g} seconds.")
+            print('  After the countdown, say "Yes, approve" or "Confirm transaction".')
             signal = record_audio(args.seconds)
             if args.save_captures:
                 save_capture("voice", signal)
 
+        print("  Checking your voice...")
         try:
             result = verifier.verify(extract_features(signal), name)
         except ValueError as error:
@@ -130,6 +166,9 @@ def run_voice_check(args, name):
         print(f"  [{attempt}/{args.attempts}] {message}")
         if args.audio:
             break
+        if attempt < args.attempts:
+            print(f"  {tries_left(attempt, args.attempts)}. Recording again - "
+                  "speak clearly, close to the microphone.")
     return False, message
 
 
@@ -146,6 +185,8 @@ def main(argv=None):
     name = (args.name or input("Username: ")).strip().lower()
     if not name:
         return access_denied("no username given")
+
+    show_overview(name)
 
     from app.capture import CaptureError
     try:
@@ -164,7 +205,7 @@ def main(argv=None):
         return access_denied("cancelled")
 
     show_product(prediction)
-    print("\n  ACCESS GRANTED")
+    print("\n  ACCESS GRANTED - your face and voice both matched.")
     return 0
 
 
