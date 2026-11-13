@@ -42,6 +42,54 @@ python main.py --name bode --image photo.jpg --audio voice.wav   # from files, n
 
 Exit code is 0 when access is granted and 1 when it is denied.
 
+### What you'll see
+
+The CLI explains each step as it goes, so a first-time user can follow it without this README:
+
+```
+Hi hycient. This login has 3 steps:
+  1. Face check   - we compare a photo of you with your account
+  2. Product pick - we prepare your recommendation (hidden for now)
+  3. Voice check  - you say a short phrase, then we show the result
+
+=== Step 1/3 - Facial recognition ===
+  A camera window is opening so we can take your photo.
+  Look at the camera and press SPACE to take the photo (Q or ESC cancels).
+  Photo taken. Checking your face... (this can take a few seconds)
+  Face verified as hycient (similarity 0.814)
+  Next: preparing your product recommendation.
+
+=== Step 2/3 - Product recommendation ===
+  Your recommendation is ready (customer 188).
+  It stays hidden until your voice confirms it's you.
+  Next: the voice check.
+
+=== Step 3/3 - Voice validation ===
+  No camera this time - we only record your voice for 4 seconds.
+  After the countdown, say "Yes, approve" or "Confirm transaction".
+  Recording in 3...
+  ...
+  Checking your voice...
+  Voice verified as hycient
+
+=== Predicted product ===
+  Clothing  (confidence 50%)
+  runner-up: Sports (20%)
+
+  ACCESS GRANTED - your face and voice both matched.
+```
+
+When a check fails, the CLI says why, how many tries are left and that it is opening the camera
+(or recording) again. The camera window also shows the attempt number:
+
+```
+  [1/3] Face does not match this account.
+  2 tries left. Opening the camera again - face it directly, in good light.
+```
+
+After the last failed try, or if you cancel with Q or ESC, the run ends with `ACCESS DENIED` and
+the reason. Nothing about the product is shown.
+
 ### Notes
 
 - The datasets do not link members to customers, so `app/members.json` assigns each member a
