@@ -1,0 +1,17 @@
+# CLI runtime (camera + microphone + all three models).
+# facenet-pytorch 2.6.0 pins old torch/numpy/pillow, so install it separately without deps:
+#   pip install -r requirements.txt
+#   pip install facenet-pytorch==2.6.0 --no-deps
+torch>=2.15
+torchvision>=0.29
+scikit-learn==1.9.0
+numpy
+pandas
+pillow
+joblib
+tqdm
+requests
+librosa
+soundfile
+sounddevice
+opencv-python
