@@ -10,11 +10,12 @@ class CaptureError(RuntimeError):
     pass
 
 
-def capture_photo(camera_index=0, preview=True, warmup_frames=15):
+def capture_photo(camera_index=0, preview=True, warmup_frames=15, note=None):
     """Return one BGR frame from the webcam.
 
     preview=True opens a window: SPACE captures, Q / ESC cancels.
     preview=False lets the camera settle for a few frames and grabs one.
+    note is an extra line drawn on the preview (e.g. "Attempt 2 of 3").
     """
     import cv2
 
@@ -41,6 +42,9 @@ def capture_photo(camera_index=0, preview=True, warmup_frames=15):
             shown = frame.copy()
             cv2.putText(shown, "SPACE: capture   Q: cancel", (10, 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+            if note:
+                cv2.putText(shown, note, (10, 65),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
             cv2.imshow(window, shown)
             key = cv2.waitKey(1) & 0xFF
             if key == ord(" "):
