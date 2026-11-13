@@ -135,7 +135,7 @@ def run_product_model(args, name):
 
 
 def run_voice_check(args, name):
-    from app.capture import record_audio
+    from app.capture import CaptureError, record_audio
     from voice_recognition.audio_features import extract_features, load_audio
     from voice_recognition.models.voice_verification import VoiceVerification
 
@@ -144,7 +144,10 @@ def run_voice_check(args, name):
     for attempt in range(1, args.attempts + 1):
         if args.audio:
             print(f"  Using the recording {args.audio} instead of the microphone.")
-            signal = load_audio(args.audio)
+            try:
+                signal = load_audio(args.audio)
+            except Exception as error:  # librosa/soundfile raise their own error types
+                raise CaptureError(f"Could not read the audio file {args.audio}: {error}") from error
         else:
             if attempt == 1:
                 print(f"  No camera this time - we only record your voice for {args.seconds:g} seconds.")
@@ -185,6 +188,10 @@ def main(argv=None):
     name = (args.name or input("Username: ")).strip().lower()
     if not name:
         return access_denied("no username given")
+
+    for label, path in (("Photo", args.image), ("Audio", args.audio)):
+        if path and not Path(path).is_file():
+            return access_denied(f"{label} file not found: {path}")
 
     show_overview(name)
 
