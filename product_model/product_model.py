@@ -1,14 +1,18 @@
 
+from pathlib import Path
+
 import joblib
 import pandas as pd
 
-model = joblib.load("models/product_model.pkl")
-feature_columns = joblib.load("models/feature_columns.pkl")
-median_rating = joblib.load("models/median_rating.pkl")
+MODELS_DIR = Path(__file__).resolve().parent / "models"
+
+model = joblib.load(MODELS_DIR / "product_model.pkl")
+feature_columns = joblib.load(MODELS_DIR / "feature_columns.pkl")
+median_rating = joblib.load(MODELS_DIR / "median_rating.pkl")
 
 USE_SCALER = False         
 if USE_SCALER:
-    scaler = joblib.load("models/scaler.pkl")
+    scaler = joblib.load(MODELS_DIR / "scaler.pkl")
 
 
 def prepare_row(customer):
